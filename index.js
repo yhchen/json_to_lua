@@ -61,3 +61,4 @@ function toLua(obj, currDepth, CurrEntry) {
     result += CurrEntry + '}';
     return result;
 }
+//# sourceMappingURL=index.js.map

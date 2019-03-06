@@ -4,7 +4,7 @@
   "description": "convert json, js object, js file to lua format",
   "main": "index.js",
   "bin": {
-    "json_to_lua": "./bin/index.js"
+    "json_to_lua": "./index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
