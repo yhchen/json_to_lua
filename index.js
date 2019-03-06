@@ -9,31 +9,52 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash = __importStar(require("lodash"));
-let MaxPreetyExpandDepth = 0;
+let MaxPrettyExpandDepth = 0;
 const INIFINIT = 65536;
 /**
  * @description Convert js object to lua string (data only. no functional)
  * @param obj js object
- * @param maxPreetyExpandDepth max pretty expand depth(level). default is 65536
  * @returns string in lua format
  */
-function jsObjectToLuaString(obj, maxPreetyExpandDepth = INIFINIT) {
-    MaxPreetyExpandDepth = maxPreetyExpandDepth;
+function jsObjectToLua(obj) {
+    MaxPrettyExpandDepth = 0;
     return toLua(obj, 0);
 }
-exports.jsObjectToLuaString = jsObjectToLuaString;
+exports.jsObjectToLua = jsObjectToLua;
 /**
  * @description Convert json string to lua string
  * @param s json string
- * @param maxPreetyExpandDepth max pretty expand depth(level). default is 65536
  * @returns string in lua format
  */
-function jsonToLuaString(s, maxPreetyExpandDepth = INIFINIT) {
-    MaxPreetyExpandDepth = maxPreetyExpandDepth;
+function jsonToLua(s) {
+    MaxPrettyExpandDepth = 0;
     const obj = JSON.parse(s);
     return toLua(obj, 0);
 }
-exports.jsonToLuaString = jsonToLuaString;
+exports.jsonToLua = jsonToLua;
+/**
+ * @description Convert js object to lua string (data only. no functional)
+ * @param obj js object
+ * @param maxPrettyExpandDepth max pretty expand depth(level). default is 65536
+ * @returns string in lua format
+ */
+function jsObjectToLuaPretty(obj, maxPrettyExpandDepth = INIFINIT) {
+    MaxPrettyExpandDepth = maxPrettyExpandDepth;
+    return toLua(obj, 0);
+}
+exports.jsObjectToLuaPretty = jsObjectToLuaPretty;
+/**
+ * @description Convert json string to lua string
+ * @param s json string
+ * @param maxPrettyExpandDepth max pretty expand depth(level). default is 65536
+ * @returns string in lua format
+ */
+function jsonToLuaPretty(s, maxPrettyExpandDepth = INIFINIT) {
+    MaxPrettyExpandDepth = maxPrettyExpandDepth;
+    const obj = JSON.parse(s);
+    return toLua(obj, 0);
+}
+exports.jsonToLuaPretty = jsonToLuaPretty;
 /**
  * Digital character set
  */
@@ -73,12 +94,12 @@ function isValidWord(s) {
  * @return string in lua format
  */
 function toLua(obj, currDepth, CurrEntry) {
-    const preety = MaxPreetyExpandDepth > currDepth;
+    const pretty = MaxPrettyExpandDepth > currDepth;
     const NextDepth = currDepth + 1;
-    CurrEntry = (CurrEntry != undefined && preety) ? CurrEntry + '\t' : '';
-    const ObjectEntry = (CurrEntry != undefined && preety) ? CurrEntry + '\t' : '';
-    const EndLine = preety ? '\n' : '';
-    const WriteSpace = preety ? ' ' : '';
+    CurrEntry = (CurrEntry != undefined && pretty) ? CurrEntry + '\t' : '';
+    const ObjectEntry = (CurrEntry != undefined && pretty) ? CurrEntry + '\t' : '';
+    const EndLine = pretty ? '\n' : '';
+    const WriteSpace = pretty ? ' ' : '';
     if (obj === null || obj === undefined) {
         return 'nil';
     }
