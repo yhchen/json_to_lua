@@ -1,6 +1,6 @@
 {
   "name": "json_to_lua",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "convert json, js object, js file to lua format",
   "main": "index.js",
   "bin": {
