@@ -9,18 +9,71 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash = __importStar(require("lodash"));
-let MaxPreetyDepth = 0;
-function toLuaString(obj, maxPreetyDepth = 0) {
-    MaxPreetyDepth = maxPreetyDepth;
+let MaxPreetyExpandDepth = 0;
+const INIFINIT = 65536;
+/**
+ * @description Convert js object to lua string (data only. no functional)
+ * @param obj js object
+ * @param maxPreetyExpandDepth max pretty expand depth(level). default is 65536
+ * @returns string in lua format
+ */
+function jsObjectToLuaString(obj, maxPreetyExpandDepth = INIFINIT) {
+    MaxPreetyExpandDepth = maxPreetyExpandDepth;
     return toLua(obj, 0);
 }
-exports.toLuaString = toLuaString;
+exports.jsObjectToLuaString = jsObjectToLuaString;
+/**
+ * @description Convert json string to lua string
+ * @param s json string
+ * @param maxPreetyExpandDepth max pretty expand depth(level). default is 65536
+ * @returns string in lua format
+ */
+function jsonToLuaString(s, maxPreetyExpandDepth = INIFINIT) {
+    MaxPreetyExpandDepth = maxPreetyExpandDepth;
+    const obj = JSON.parse(s);
+    return toLua(obj, 0);
+}
+exports.jsonToLuaString = jsonToLuaString;
+/**
+ * Digital character set
+ */
 const NumberCharSet = new Set(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
-const FirstInvalidCharSet = new Set(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+/**
+ * The first valid character set for a word
+ */
+const WordFirstValidCharSet = new Set(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
     'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
     '_']);
+/**
+ *
+ * @description Check 's' is a vaild word
+ * @param s input string
+ * @returns true if 's' is a Valid word
+ */
+function isValidWord(s) {
+    for (let i = 0; i < s.length; ++i) {
+        const c = s[i];
+        if (i == 0) {
+            if (!WordFirstValidCharSet.has(c))
+                return false;
+        }
+        else {
+            if (!WordFirstValidCharSet.has(c) && !NumberCharSet.has(c))
+                return false;
+        }
+    }
+    return true;
+}
+/**
+ *
+ * @description convert json object to lua string
+ * @param obj js object
+ * @param currDepth Recursion depth
+ * @param CurrEntry Current line grammar indentation format
+ * @return string in lua format
+ */
 function toLua(obj, currDepth, CurrEntry) {
-    const preety = MaxPreetyDepth > currDepth;
+    const preety = MaxPreetyExpandDepth > currDepth;
     const NextDepth = currDepth + 1;
     CurrEntry = (CurrEntry != undefined && preety) ? CurrEntry + '\t' : '';
     const ObjectEntry = (CurrEntry != undefined && preety) ? CurrEntry + '\t' : '';
@@ -42,14 +95,15 @@ function toLua(obj, currDepth, CurrEntry) {
             objStr = toLua(v, NextDepth, CurrEntry);
         }
         else {
-            if (parseInt(k).toString() == k || (k.length > 0 && !FirstInvalidCharSet.has(k[0]))) {
+            const isword = isValidWord(k);
+            if (parseInt(k).toString() == k) {
                 objStr = '[' + k + `]${WriteSpace}=${WriteSpace}` + toLua(v, NextDepth, CurrEntry);
             }
-            else if (NumberCharSet.has(k[0])) {
-                objStr = '["' + k + `"]${WriteSpace}=${WriteSpace}` + toLua(v, NextDepth, CurrEntry);
+            else if (isword) {
+                objStr = k + `${WriteSpace}=${WriteSpace}` + toLua(v, NextDepth, CurrEntry);
             }
             else {
-                objStr = k + `${WriteSpace}=${WriteSpace}` + toLua(v, NextDepth, CurrEntry);
+                objStr = '["' + k + `"]${WriteSpace}=${WriteSpace}` + toLua(v, NextDepth, CurrEntry);
             }
         }
         if (i < len - 1) {
