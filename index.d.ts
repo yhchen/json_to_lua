@@ -25,3 +25,4 @@ export declare function jsObjectToLuaPretty(obj: any, maxPrettyExpandDepth?: num
  * @returns string in lua format
  */
 export declare function jsonToLuaPretty(s: string, maxPrettyExpandDepth?: number): string;
+export declare function makeLuaKey(s: string): string;

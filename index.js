@@ -55,6 +55,17 @@ function jsonToLuaPretty(s, maxPrettyExpandDepth = INIFINIT) {
     return toLua(obj, 0);
 }
 exports.jsonToLuaPretty = jsonToLuaPretty;
+function makeLuaKey(s) {
+    const isword = isValidWord(s);
+    if (parseInt(s).toString() == s) {
+        return `[${s}]`;
+    }
+    else if (isword) {
+        return s;
+    }
+    return `["${s}"]`;
+}
+exports.makeLuaKey = makeLuaKey;
 /**
  * Digital character set
  */
@@ -116,16 +127,7 @@ function toLua(obj, currDepth, CurrEntry) {
             objStr = toLua(v, NextDepth, CurrEntry);
         }
         else {
-            const isword = isValidWord(k);
-            if (parseInt(k).toString() == k) {
-                objStr = '[' + k + `]${WriteSpace}=${WriteSpace}` + toLua(v, NextDepth, CurrEntry);
-            }
-            else if (isword) {
-                objStr = k + `${WriteSpace}=${WriteSpace}` + toLua(v, NextDepth, CurrEntry);
-            }
-            else {
-                objStr = '["' + k + `"]${WriteSpace}=${WriteSpace}` + toLua(v, NextDepth, CurrEntry);
-            }
+            objStr = `${makeLuaKey(k)}${WriteSpace}=${WriteSpace}${toLua(v, NextDepth, CurrEntry)}`;
         }
         if (i < len - 1) {
             objStr += ',';
