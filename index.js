@@ -116,6 +116,9 @@ function toLua(obj, currDepth, CurrEntry) {
     }
     if (!lodash.isObject(obj)) {
         if (typeof obj === 'string') {
+            if (obj.indexOf("\"") >= 0) {
+                return "'" + obj + "'";
+            }
             return '"' + obj + '"';
         }
         return obj.toString();
