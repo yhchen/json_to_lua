@@ -112,6 +112,13 @@ function toLua(obj: any, currDepth: number, CurrEntry?: string): string {
 	}
 	if (!lodash.isObject(obj)) {
 		if (typeof obj === 'string') {
+			let hasTwo = obj.indexOf("\"") >= 0;
+			let hasOne = obj.indexOf("\'") >= 0;
+			if (hasTwo && hasOne) {
+				return '"' + obj.replace(/\"/g, "\\\"").replace(/\'/, "\\\'") + '"';
+			} else if (hasTwo) {
+				return "'" + obj + "'";
+			}
 			return '"' + obj + '"';
 		}
 		return obj.toString();
